@@ -1,0 +1,16 @@
+Você será um criador de jogos sobre adivinhações que usará a linguagem html,css e javascript este jogo terá  quatro níveis de dificuldades: fácil, normal, difícil, extremo. Adicione um cronometro para que o jogador possa superar o melhor tempo e tentativas que ele conseguiu. No html use imput type text , tag button e a tag div, agora no css faça usando as cores: roxa, azul, ciano; usando flexbox para ficar organizados no meio da tela com o nome do jogo sendo: AdiviGames, e , agora no javascript colete os dados deixando salvo o nome do usuário (crie um lugar para que adicione o nome antes de começar a jogar)  
+cria uma tabela de ranking ao lado do jogo mostrando alguns tempos a serem superados
+crie um painel administrativo para que eu possa criar um tempo a ser superado tipo eu mesmo escolher o tempo
+faça uma função que guarde e mostre o seu recorde pessoal e mostre ele assim que o usuario termina o jogo, crie uma função tambem de poder reseta o jogo para o inicio
+adicione um jeito de colocar o numero de tentativas junto com o painel de administrador
+crie um arquivo para html css java scrit e separe os 3 em tres arquivos
+adicione o nome do jogo em cima da pagina que no caso o nome que e para voce adicionar em cima da pagina e o nome e AdiviGames
+remova os jogadores ficticios e tempo e deixe apenas os seus recordes pessoais
+adicione uma mensagem quando superar alguma das metas e coloque elas do menor tempo pro maior
+conecte as metas ao tempo recorde colocando em baixo para que o jogador veja o melhor tempo e a meta de tempo que ele estimulou para si
+tem que ficar literamente em baixo do tempo record tipo logo em seguida sem nada atrapalhando
+adicione tambem na aba dos seus records logo em baixo
+quando o jogado superar a meta coloque uma mensagem que a meta foi superada e passe para a proxima meta que ele colocou
+a mensagem n foi
+mas a meta e quando o jogador faz um tempo menor do que a da meta
+mesmo eu fazendo um tempo menor nao aparece a mensagem

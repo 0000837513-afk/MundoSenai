@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdiviGames - Jogo de Adivinhação</title>
+    <!-- Fonte Google Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Canvas para Efeitos de Confeti de Vitória -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- CONTAINER PRINCIPAL DO JOGO -->
+    <div class="app-container">
+            <h1 class="brand-title">
+                <i class="fa-solid fa-gamepad" aria-hidden="true"></i> AdiviGames
+            </h1>
+
+        <!-- ===================================================================
+             TELA 1: IDENTIFICAÇÃO DO JOGADOR
+             =================================================================== -->
+        <div id="screen-welcome" class="glass-card">
+            
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">
+                Bem-vindo ao jogo definitivo de adivinhação! Digite seu nome para começar o desafio.
+            </p>
+
+            <div class="input-group">
+                <div class="input-label">
+                    <i class="fa-solid fa-user"></i> Nome do Jogador
+                </div>
+                <!-- Requisito: Input type text -->
+                <input type="text" id="player-name-input" class="custom-input" placeholder="Ex: CyberPlayer" maxlength="15" autocomplete="off">
+            </div>
+
+            <!-- Requisito: Tag button -->
+            <button id="btn-start" class="btn-neon" onclick="submitPlayerName()">
+                <span>Entrar no Jogo</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             TELA 2: ARENA DE JOGO (DIFICULDADE, CHUTES E CRONÔMETRO)
+             =================================================================== -->
+        <div id="game-layout" class="game-layout hidden">
+        <div id="screen-game" class="glass-card">
+            
+            <!-- Barra Superior do Jogador -->
+            <div class="player-bar">
+                <div class="player-name-tag">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                    <span id="display-player-name">Jogador</span>
+                </div>
+                <button class="btn-mini" onclick="changePlayer()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Trocar
+                </button>
+            </div>
+
+            <!-- Seleção de Dificuldade -->
+            <div class="input-group">
+                <div class="input-label">
+                    <i class="fa-solid fa-sliders"></i> Dificuldade
+                </div>
+                <div class="difficulty-grid">
+                    <button class="diff-btn" id="diff-facil" onclick="setDifficulty('facil')">
+                        Fácil
+                        <span class="range">(1 a 50)</span>
+                    </button>
+                    <button class="diff-btn active" id="diff-normal" onclick="setDifficulty('normal')">
+                        Normal
+                        <span class="range">(1 a 100)</span>
+                    </button>
+                    <button class="diff-btn" id="diff-dificil" onclick="setDifficulty('dificil')">
+                        Difícil
+                        <span class="range">(1 a 500)</span>
+                    </button>
+                    <button class="diff-btn" id="diff-extremo" onclick="setDifficulty('extremo')">
+                        Extremo
+                        <span class="range">(1 a 1000)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Painel de Estatísticas da Rodada -->
+            <div class="stats-dashboard">
+                <div class="stat-box">
+                    <div class="stat-label">
+                        <i class="fa-regular fa-clock" style="color: var(--cyan-main);"></i> Tempo
+                    </div>
+                    <div class="stat-value" id="timer-display">00:00.0</div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-label">
+                        <i class="fa-solid fa-bullseye" style="color: var(--purple-glow);"></i> Tentativas
+                    </div>
+                    <div class="stat-value" id="attempts-display">0</div>
+                </div>
+            </div>
+
+            <!-- Banner de Recorde Pessoal na Dificuldade Atual -->
+            <div class="record-banner personal-record-panel">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-trophy" style="color: #ffd700; font-size: 1.1rem;"></i>
+                    <span style="font-weight: 600; color: var(--text-light);">Seu Melhor Recorde</span>
+                </div>
+                <div class="record-info">
+                    <span id="best-record-display" class="record-value">Nenhum</span>
+                    <span id="personal-goal-display" class="personal-goal-value">Meta: nenhuma definida</span>
+                </div>
+            </div>
+
+            <!-- Painel de Dicas -->
+            <div id="hint-container" class="hint-box">
+                <div id="hint-main-text" class="hint-main">Faça o seu primeiro palpite!</div>
+                <div id="hint-proximity-badge" class="hint-proximity hidden">Proximidade</div>
+            </div>
+
+            <!-- Entrada do Palpite -->
+            <div class="input-group">
+                <div class="input-label" id="range-label">
+                    <i class="fa-solid fa-hashtag"></i> Digite um número de 1 a 100
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <!-- Requisito: Input type text -->
+                    <input type="text" id="guess-input" class="custom-input" placeholder="Seu palpite..." autocomplete="off">
+                    <!-- Requisito: Tag button -->
+                    <button class="btn-neon" style="width: 120px;" onclick="makeGuess()">
+                        <span>Chutar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Histórico das tentativas -->
+            <div class="input-group">
+                <div class="input-label" style="font-size: 0.75rem;">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Palpites Anteriores
+                </div>
+                <div id="history-list" class="history-container">
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Nenhum chute ainda</span>
+                </div>
+            </div>
+
+        </div>
+
+        <aside class="glass-card ranking-panel" aria-labelledby="ranking-title">
+            <div class="ranking-heading">
+                <i class="fa-solid fa-trophy ranking-icon" aria-hidden="true"></i>
+                <div>
+                    <h2 id="ranking-title" class="ranking-title">Seus recordes</h2>
+                    <p class="ranking-subtitle">Melhores resultados por dificuldade</p>
+                </div>
+            </div>
+
+            <div class="ranking-table-wrap">
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Dificuldade</th>
+                            <th scope="col">Tempo</th>
+                            <th scope="col">Tent.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-body" aria-live="polite"></tbody>
+                </table>
+            </div>
+
+            <section class="personal-goals-section" aria-labelledby="personal-goals-title">
+                <h3 id="personal-goals-title" class="personal-goals-title">
+                    <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> Metas pessoais
+                </h3>
+                <ul id="personal-goals-list" class="personal-goals-list" aria-live="polite"></ul>
+            </section>
+
+            <details class="admin-panel">
+                <summary>
+                    <span><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Painel administrativo</span>
+                    <i class="fa-solid fa-chevron-down admin-chevron" aria-hidden="true"></i>
+                </summary>
+                <form id="target-form" class="admin-form">
+                    <div class="admin-field">
+                        <label for="target-name">Nome do desafio</label>
+                        <input id="target-name" class="admin-input" type="text" maxlength="15" placeholder="Ex.: Meu recorde" required>
+                    </div>
+                    <div class="admin-field">
+                        <label for="target-difficulty">Dificuldade</label>
+                        <select id="target-difficulty" class="admin-input">
+                            <option value="facil">Fácil</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="dificil">Difícil</option>
+                            <option value="extremo">Extremo</option>
+                        </select>
+                    </div>
+                    <div class="admin-field">
+                        <label for="target-time">Tempo-alvo (segundos)</label>
+                        <input id="target-time" class="admin-input" type="number" min="0.1" max="5999.9" step="0.1" placeholder="Ex.: 15,5" required>
+                    </div>
+                    <div class="admin-field">
+                        <label for="target-attempts">Tentativas de referência</label>
+                        <input id="target-attempts" class="admin-input" type="number" min="1" max="1000" step="1" placeholder="Ex.: 5" required>
+                    </div>
+                    <button class="btn-neon admin-submit" type="submit">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar tempo
+                    </button>
+                    <p id="admin-status" class="admin-status" role="status" aria-live="polite"></p>
+                </form>
+                <div class="admin-targets">
+                    <h3 class="admin-targets-title">Metas configuradas</h3>
+                    <ul id="admin-target-list" class="admin-target-list" aria-live="polite"></ul>
+                </div>
+            </details>
+
+            <p class="ranking-note">Seus melhores tempos são salvos neste navegador para cada dificuldade.</p>
+        </aside>
+        </div>
+
+    </div>
+
+    <!-- ===================================================================
+         MODAL DE VITÓRIA / COMEMORAÇÃO
+         =================================================================== -->
+    <div id="modal-victory" class="victory-overlay hidden">
+        <div class="glass-card victory-card">
+            <div class="victory-icon">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+            
+            <h2 style="font-size: 1.8rem; font-weight: 900; color: #fff;">VOCÊ ACERTOU!</h2>
+            
+            <p id="victory-message" role="status" aria-live="polite" style="color: var(--cyan-main); font-size: 1rem; font-weight: 600;">
+                Parabéns, você descobriu o número secreto!
+            </p>
+
+            <div class="stats-dashboard" style="margin: 10px 0;">
+                <div class="stat-box">
+                    <div class="stat-label">Tempo Total</div>
+                    <div class="stat-value" id="final-time">00:00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Tentativas</div>
+                    <div class="stat-value" id="final-attempts">0</div>
+                </div>
+            </div>
+
+            <div id="new-record-tag" class="hidden" style="background: rgba(0, 229, 255, 0.2); border: 1px solid var(--cyan-main); color: var(--cyan-glow); padding: 8px 14px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; width: 100%;">
+                ⚡ NOVO RECORDE PESSOAL REGISTRADO!
+            </div>
+
+            <div class="record-banner" aria-live="polite">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-trophy" style="color: #ffd700; font-size: 1.1rem;"></i>
+                    <span style="font-weight: 600; color: var(--text-light);">Seu recorde nesta dificuldade</span>
+                </div>
+                <div class="record-info">
+                    <span id="victory-record-display" class="record-value">Nenhum</span>
+                </div>
+            </div>
+
+            <div style="width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <button class="btn-neon" onclick="restartRound()">
+                    <i class="fa-solid fa-rotate-right"></i> Jogar Novamente
+                </button>
+                <button class="btn-neon btn-secondary" onclick="returnToStart()">
+                    <i class="fa-solid fa-house"></i> Voltar ao Início
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===================================================================
+         CÓDIGO JAVASCRIPT (LÓGICA DO JOGO, LOCALSTORAGE & CONFETI)
+         =================================================================== -->
+    <script src="script.js"></script>
+</body>
+</html>
